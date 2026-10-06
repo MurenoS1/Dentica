@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Зубной капитал</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;600;700&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#E9F5F3;--ink:#0B3340;--muted:#5D8089;--panel:#fff;--line:#CFE5E1;--c1:#0F4C5C;--c2:#16798A;--ac:#FF6F59;--ok:#1E9E75;
+--body:'Onest',system-ui,-apple-system,'Segoe UI',sans-serif;--head:'Unbounded','Onest',system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#0A2229;--ink:#E3F3F0;--muted:#8FB1B8;--panel:#11313A;--line:#1E4854}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);overflow:hidden;padding-top:env(safe-area-inset-top,0px);user-select:none;-webkit-user-select:none;touch-action:manipulation}
+#app{height:100%;display:flex;flex-direction:column;max-width:520px;margin:0 auto}
+main{flex:1;min-height:0;position:relative}
+.tab{position:absolute;inset:0;padding:14px 16px;display:none;overflow-y:auto}
+.tab.on{display:flex;flex-direction:column}
+.cc{border-radius:20px;padding:16px 20px;color:#fff;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:0 10px 24px -10px rgba(15,76,92,.7)}
+.cc::after{content:"";position:absolute;right:-40px;top:-60px;width:180px;height:180px;border-radius:50%;border:26px solid rgba(255,255,255,.08)}
+.cc-top{display:flex;justify-content:space-between;font-size:13px;opacity:.85}
+.chip{width:38px;height:28px;border-radius:6px;background:linear-gradient(135deg,#F3D58A,#C9A24B);margin-top:10px}
+.bal{font-family:var(--head);font-weight:700;font-size:clamp(24px,7.5vw,34px);margin:8px 0 2px;font-variant-numeric:tabular-nums}
+.cc-sub{font-size:12px;opacity:.8}
+.cc-bot{display:flex;justify-content:space-between;margin-top:12px;font-size:13px}
+.pill{background:rgba(255,255,255,.16);padding:3px 10px;border-radius:99px}
+#stage{flex:1;min-height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+#tooth{width:min(58vw,240px);filter:drop-shadow(0 14px 14px rgba(11,51,64,.25));transition:transform .09s;cursor:pointer}
+#tooth.down{transform:scale(.93)}
+.hint{margin-top:10px;font-size:13px;color:var(--muted);min-height:18px}
+.float{position:absolute;font-family:var(--head);font-weight:700;color:var(--ac);pointer-events:none;animation:fl .8s ease-out forwards}
+@keyframes fl{to{transform:translateY(-90px);opacity:0}}
+.lvbar{height:8px;border-radius:9px;background:var(--line);overflow:hidden}
+.lvbar i{display:block;height:100%;width:0;background:var(--ac);transition:width .2s}
+.lvline{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px}
+h2{font-family:var(--head);font-size:14px;margin:14px 0 8px;font-weight:500}
+h2:first-child{margin-top:2px}
+.stats{display:flex;gap:8px}
+.stat{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:9px 11px}
+.stat b{display:block;font-family:var(--head);font-size:13px;margin-top:2px}.stat span{font-size:11px;color:var(--muted)}
+.row{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:11px;margin-bottom:8px;width:100%;text-align:left;color:inherit;font:inherit}
+.ic{font-size:24px;width:40px;height:40px;flex:none;display:grid;place-items:center;border-radius:12px;background:var(--bg)}
+.tx{flex:1;min-width:0}.tx b{display:block;font-size:14px}.tx span{font-size:12px;color:var(--muted)}
+.pr{font-family:var(--head);font-size:12px;font-weight:500;color:var(--ok);white-space:nowrap}
+button.row:disabled{opacity:.55}button.row:disabled .pr{color:var(--muted)}
+button.row:not(:disabled):active{transform:scale(.98)}
+.lv{display:flex;gap:10px;padding:8px 12px;border-radius:12px;font-size:14px;color:var(--muted)}
+.lv.cur{background:var(--panel);border:1px solid var(--ac);color:var(--ink);font-weight:600}.lv.done{color:var(--ink)}
+.lv em{margin-left:auto;font-style:normal;font-size:12px}
+.pb{height:6px;border-radius:6px;background:var(--line);margin-top:6px;overflow:hidden}.pb i{display:block;height:100%;background:var(--ok);width:0}
+.tk{border:0;border-radius:10px;padding:9px 12px;font:600 12px var(--body);background:var(--ink);color:var(--bg);white-space:nowrap}
+.tk:disabled{background:var(--line);color:var(--muted)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ach{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center;opacity:.45;filter:grayscale(1)}
+.ach.on{opacity:1;filter:none;border-color:var(--ok)}.ach .ic{margin:0 auto 6px;font-size:26px}.ach b{display:block;font-size:13px}.ach span{font-size:11px;color:var(--muted)}
+.rk{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--panel);border:1px solid var(--line);margin-bottom:6px;font-size:14px}
+.rk.me{border-color:var(--ac);font-weight:600}.rk .n{width:26px;color:var(--muted)}.rk .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rk .lv2{font-size:11px;color:var(--muted)}.rk .sc{font-family:var(--head);font-size:12px}
+.note{font-size:13px;color:var(--muted);line-height:1.5}
+nav{display:flex;gap:6px;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px))}
+nav button{flex:1;border-radius:12px;padding:7px 2px;font:600 11px var(--body);background:var(--panel);color:var(--muted);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button span{font-size:18px}nav button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+#toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translate(-50%,-160%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;transition:transform .25s;z-index:9;max-width:90vw;text-align:center}
+#toast.show{transform:translate(-50%,0)}
+#ev{position:fixed;inset:0;background:rgba(5,25,30,.6);display:none;align-items:flex-end;justify-content:center;z-index:8}
+#ev.on{display:flex}
+.sheet{background:var(--panel);width:100%;max-width:520px;border-radius:22px 22px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom,0px))}
+.sheet h3{font-family:var(--head);font-size:14px;margin:0 0 8px;font-weight:500}.sheet p{margin:0 0 14px;line-height:1.45}
+#evO{display:flex;flex-direction:column;gap:8px}
+#evO button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:13px;font:600 14px var(--body)}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div id="app">
+<main>
+ <section class="tab on" id="t-main">
+  <div class="cc">
+   <div class="cc-top"><span>Дентал Банк</span><span id="lvTag"></span></div>
+   <div class="chip"></div>
+   <div class="bal" id="bal">0 ₽</div>
+   <div class="cc-sub">заработано на пломбах и улыбках</div>
+   <div class="cc-bot"><span id="holder">ВРАЧ</span><span class="pill" id="rate"></span></div>
+  </div>
+  <div id="stage">
+   <svg id="tooth" viewBox="0 0 200 220" role="button" aria-label="Зуб">
+    <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#CFE7EE"/></linearGradient></defs>
+    <path d="M60 18C30 18 14 44 20 80c4 30 20 50 25 90 3 28 17 40 28 30 12-10 10-48 27-48s15 38 27 48c11 10 25-2 28-30 5-40 21-60 25-90 6-36-10-62-40-62-15 0-28 10-40 10S75 18 60 18z" fill="url(#g)" stroke="#9CC3CC" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M48 40c-12 4-16 22-14 36" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" opacity=".9"/>
+    <circle cx="78" cy="88" r="5" fill="#0B3340"/><circle cx="122" cy="88" r="5" fill="#0B3340"/>
+    <path d="M84 108q16 14 32 0" fill="none" stroke="#0B3340" stroke-width="5" stroke-linecap="round"/>
+   </svg>
+   <div class="hint" id="hint">Нажимай на зуб</div>
+  </div>
+  <div><div class="lvline"><span id="lvName"></span><span id="lvNext"></span></div><div class="lvbar"><i id="lvFill"></i></div></div>
+ </section>
+ <section class="tab" id="t-up">
+  <div class="stats"><div class="stat"><span>За тап</span><b id="sTap"></b></div><div class="stat"><span>В секунду</span><b id="sSec"></b></div><div class="stat"><span>Бонус уровня</span><b id="sMul"></b></div></div>
+  <h2>Для тапа</h2><div id="upT"></div>
+  <h2>Для дохода</h2><div id="upA"></div>
+  <h2>Уровни</h2><div id="lvls"></div>
+ </section>
+ <section class="tab" id="t-tk">
+  <h2>Задания дня</h2>
+  <p class="note" id="tkNote"></p><div id="tks"></div>
+ </section>
+ <section class="tab" id="t-ac"><h2>Достижения <span id="acN" class="note"></span></h2><div class="grid" id="achs"></div></section>
+ <section class="tab" id="t-rk"><h2>Рейтинг игроков</h2><p class="note" id="rkN"></p><div id="top"></div></section>
+</main>
+<nav>
+ <button class="on" data-t="t-main"><span>🦷</span>Приём</button>
+ <button data-t="t-up"><span>🏥</span>Кабинет</button>
+ <button data-t="t-tk"><span>📋</span>Задания</button>
+ <button data-t="t-ac"><span>🏆</span>Награды</button>
+ <button data-t="t-rk"><span>📊</span>Рейтинг</button>
+</nav>
+</div>
+<div id="toast"></div>
+<div id="ev"><div class="sheet"><h3>Ситуация в клинике</h3><p id="evT"></p><div id="evO"></div></div></div>
+
+<script>
+// Настройки Supabase для рейтинга (см. инструкцию). Пока пусто — рейтинг выключен.
+const SB={url:'',key:''};
+
+const tg=window.Telegram&&window.Telegram.WebApp;
+try{if(tg){tg.ready();tg.expand()}}catch(e){}
+const KEY='dental_tapper_v2',CAP=90*60,DAY=864e5,SUF=['','тыс','млн','млрд','трлн','квадр'];
+
+const TN=['Электрощётка','Ирригатор','Бормашина','Ультразвуковой скалер','Лазер для дёсен','Фотополимерная лампа','Эндомотор','Пескоструй Air-Flow','Микроскоп','Цифровой сканер','3D-принтер коронок','Робот-ассистент','ИИ-диагност','Нано-пломба','Квантовый бор'];
+const TI=['🪥','💧','🦷','🔊','🔦','💡','⚙️','💨','🔬','📷','🖨️','🤖','🧠','✨','⚛️'];
+const AN=['Администратор','Ассистент','Новое кресло','Рентген','Стерилизатор','Рекламный баннер','Сайт с записью','Второй кабинет','Зубной техник','Своя лаборатория','Франшиза','Страховой договор','Сеть клиник','Научный центр','Дентал-холдинг'];
+const AI=['🧑‍💼','🧑‍⚕️','💺','☢️','♨️','📣','🌐','🚪','🧑‍🔧','🧪','🏷️','📄','🏥','🎓','🏛️'];
+const UPS=[];
+TN.forEach((n,i)=>UPS.push({id:'t'+i,ic:TI[i],name:n,type:'tap',val:Math.round(Math.pow(2.3,i)),base:Math.round(40*Math.pow(3.1,i)),k:1.35}));
+AN.forEach((n,i)=>UPS.push({id:'a'+i,ic:AI[i],name:n,type:'auto',val:Math.round(5*Math.pow(2.5,i))/10,base:Math.round(120*Math.pow(3.2,i)),k:1.35}));
+const LN=['Студент','Практикант','Интерн','Ординатор','Ассистент врача','Терапевт','Хирург','Ортодонт','Пародонтолог','Эндодонтист','Имплантолог','Челюстно-лицевой хирург','Заведующий отделением','Главврач','Владелец кабинета','Владелец клиники','Директор сети','Эксперт-лектор','Профессор','Академик','Легенда стоматологии','Зубная фея'];
+const LEVELS=LN.map((n,i)=>({n,min:i?Math.round(300*Math.pow(2.2,i-1)):0}));
+const TASKS=[
+ {id:'taps',t:'Сделать 300 тапов',goal:300,pct:.06},{id:'buy',t:'Купить 3 улучшения',goal:3,pct:.08},
+ {id:'cab',t:'Заглянуть в кабинет',goal:1,pct:.03},{id:'ev',t:'Решить игровую ситуацию',goal:1,pct:.10},
+ {id:'time',t:'Провести в игре 5 минут',goal:300,pct:.15}];
+const EV=[
+ {t:'Пациент испугался бормашины и хочет уйти, не заплатив.',o:[{l:'Успокоить',d:1,r:'Пациент остался и оставил чаевые.'},{l:'Отпустить',d:-1,r:'Пациент ушёл, приём пропал.'}]},
+ {t:'Рекламщик предлагает баннер у метро.',o:[{l:'Купить',d:-2,b:[1.25,90],r:'Клиентов стало больше на 1,5 минуты.'},{l:'Отказаться',d:0,r:'Решили сэкономить.'}]},
+ {t:'В кабинете перегорел свет.',o:[{l:'Вызвать электрика',d:-1,r:'Электрик взял за срочность.'},{l:'Работать с фонариком',d:0,b:[.8,60],r:'Минуту работа идёт медленнее.'}]},
+ {t:'Блогер снял ваш приём на видео.',o:[{l:'Разрешить',d:3,b:[1.2,60],r:'Ролик разошёлся, клиентов прибавилось.'},{l:'Запретить',d:0,r:'Всё осталось как было.'}]},
+ {t:'Налоговая просит бумаги.',o:[{l:'Оформить сразу',d:-1,r:'Заплатили небольшой сбор.'},{l:'Отложить',d:-2,b:[.85,60],r:'Штраф и нервы, минуту работа идёт хуже.'}]},
+ {t:'Поставщик предлагает партию материалов со скидкой.',o:[{l:'Взять',d:-1,b:[1.3,120],r:'Материалы хорошие, приём ускорился.'},{l:'Пропустить',d:0,r:'Закупите в другой раз.'}]},
+ {t:'Пациент нашёл в кармане купюру и отдал вам.',o:[{l:'Взять',d:2,r:'Приятный бонус.'},{l:'Отказаться',d:0,r:'Честность — лучшая политика.'}]},
+ {t:'Сломался компрессор.',o:[{l:'Починить',d:-2,r:'Ремонт обошёлся недёшево.'},{l:'Потерпеть',d:-1,b:[.75,90],r:'Работает через раз.'}]},
+ {t:'Коллега принёс пирожки на всю смену.',o:[{l:'Угоститься',d:0,b:[1.15,90],r:'Бодрость и хорошее настроение.'},{l:'Работать дальше',d:1,r:'Успели принять лишнего пациента.'}]},
+ {t:'Приехала проверка из санэпидемстанции.',o:[{l:'Показать журнал',d:1,r:'Проверка пройдена, выдали благодарность.'},{l:'Сказать «потом»',d:-3,r:'Пришлось заплатить штраф.'}]}];
+const ACH=[
+ ['🦷','Первый пациент','Сделай первый тап',()=>S.taps>=1],['✋','Рука набита','100 тапов',()=>S.taps>=100],
+ ['💪','Тысяча улыбок','1 000 тапов',()=>S.taps>=1e3],['🦾','Железные пальцы','10 000 тапов',()=>S.taps>=1e4],
+ ['🛒','Первая покупка','Купи любое улучшение',()=>S.bought>=1],['🧰','Оснащённый кабинет','Купи 10 улучшений',()=>S.bought>=10],
+ ['🏗️','Расширение','Купи 50 улучшений',()=>S.bought>=50],['📦','Закупочный отдел','Купи 150 улучшений',()=>S.bought>=150],
+ ['💵','Первая тысяча','Заработай 1 000 ₽',()=>S.total>=1e3],['💰','Миллионер','Заработай 1 млн ₽',()=>S.total>=1e6],
+ ['🏦','Зубной магнат','Заработай 1 млрд ₽',()=>S.total>=1e9],['🎓','Дипломированный','Достигни 5 уровня',()=>lvlIdx()>=4],
+ ['🏅','Опытный врач','Достигни 10 уровня',()=>lvlIdx()>=9],['👑','Легенда','Достигни 20 уровня',()=>lvlIdx()>=19],
+ ['🚶','Очередь в коридоре','Доход 10 ₽/сек',()=>perSec()>=10],['🏢','Поток клиентов','Доход 1 000 ₽/сек',()=>perSec()>=1e3],
+ ['🎲','Всякое бывает','Первая игровая ситуация',()=>S.events>=1],['📚','Видавший виды','10 игровых ситуаций',()=>S.events>=10],
+ ['🍀','Везунчик','5 удачных исходов',()=>S.good>=5],['🛡️','Стойкий','5 неудачных исходов',()=>S.bad>=5],
+ ['✅','Дисциплина','Забери первую награду за задание',()=>S.tasksDone>=1],['📅','Режим врача','Забери 20 наград',()=>S.tasksDone>=20],
+ ['🌙','Ночная смена','Получи доход, пока тебя не было',()=>S.offline>=1],['🐷','Копилка','Накопи 100 тыс ₽ на балансе',()=>S.coins>=1e5],
+ ['🧬','Полный комплект','Купи каждое из 30 улучшений',()=>UPS.every(u=>S.lv[u.id])]];
+
+let S={coins:0,total:0,lv:{},seen:Date.now(),taps:0,bought:0,events:0,good:0,bad:0,tasksDone:0,offline:0,ach:{},tasks:{},buff:{m:1,until:0}};
+try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+TASKS.forEach(t=>{if(!S.tasks[t.id])S.tasks[t.id]={p:0,claim:0}});
+
+const $=id=>document.getElementById(id);
+function num(n){if(n<1e4)return(n<100&&n%1?Math.round(n*10)/10:Math.floor(n)).toLocaleString('ru-RU');let i=0;while(n>=1e3&&i<5){n/=1e3;i++}return(n>=100?Math.floor(n):Math.round(n*10)/10).toLocaleString('ru-RU')+' '+SUF[i]}
+const fmt=n=>num(n)+' ₽';
+const lvlIdx=()=>{let i=0;LEVELS.forEach((l,j)=>{if(S.total>=l.min)i=j});return i};
+const bm=()=>Date.now()<S.buff.until?S.buff.m:1;
+const mult=()=>1+.05*lvlIdx();
+const sum=t=>UPS.filter(u=>u.type===t).reduce((a,u)=>a+(S.lv[u.id]||0)*u.val,0);
+const tapPower=()=>(1+sum('tap'))*mult()*bm();
+const perSec=()=>sum('auto')*mult()*bm();
+const hourly=()=>perSec()*3600+tapPower()*1800;
+const cost=u=>Math.ceil(u.base*Math.pow(u.k,S.lv[u.id]||0));
+const PID=(tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user&&String(tg.initDataUnsafe.user.id))||(()=>{try{let p=localStorage.getItem('dt_pid');if(!p){p='w'+Math.random().toString(36).slice(2,10);localStorage.setItem('dt_pid',p)}return p}catch(e){return 'w'+Date.now()}})();
+const NAME=(tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user&&tg.initDataUnsafe.user.first_name)||'Игрок';
+
+function save(){try{S.seen=Date.now();localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+let tt;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),3200)}
+function hap(k){try{const h=tg&&tg.HapticFeedback;if(h){if(k==='ok')h.notificationOccurred('success');else if(k==='bad')h.notificationOccurred('warning');else if(k==='sel')h.selectionChanged();else h.impactOccurred(k==='buy'?'medium':'light')}else if(navigator.vibrate)navigator.vibrate(k==='buy'?30:k==='ok'?[20,40,20]:k==='bad'?[40,30,40]:10)}catch(e){}}
+function inc(id,n){const t=S.tasks[id],d=TASKS.find(x=>x.id===id);if(!t||t.claim)return;t.p=Math.min(d.goal,t.p+n)}
+function earn(x){const b=lvlIdx();S.coins+=x;S.total+=x;const a=lvlIdx();if(a>b){toast('Новый уровень: '+LEVELS[a].n+'!');hap('ok')}}
+
+// построение списков
+const UR={};
+function buildUps(){
+ UPS.forEach(u=>{
+  const b=document.createElement('button');b.className='row';
+  b.innerHTML='<div class="ic">'+u.ic+'</div><div class="tx"><b>'+u.name+'</b><span></span></div><div class="pr"></div>';
+  b.onclick=()=>buy(u);UR[u.id]={b,sub:b.querySelector('span'),pr:b.querySelector('.pr')};
+  $(u.type==='tap'?'upT':'upA').appendChild(b);
+ });
+ $('lvls').innerHTML=LEVELS.map(l=>'<div class="lv"><span></span><span>'+l.n+'</span><em></em></div>').join('');
+ $('achs').innerHTML=ACH.map(a=>'<div class="ach"><div class="ic">'+a[0]+'</div><b>'+a[1]+'</b><span>'+a[2]+'</span></div>').join('');
+ $('tks').innerHTML=TASKS.map(t=>'<div class="row"><div class="tx"><b>'+t.t+'</b><span></span><div class="pb"><i></i></div></div><button class="tk"></button></div>').join('');
+ document.querySelectorAll('#tks .tk').forEach((b,i)=>b.onclick=()=>claim(TASKS[i]));
+}
+function buy(u){const c=cost(u);if(S.coins<c)return;S.coins-=c;S.lv[u.id]=(S.lv[u.id]||0)+1;S.bought++;inc('buy',1);hap('buy');render();save()}
+function claim(t){const s=S.tasks[t.id];if(s.claim||s.p<t.goal)return;const r=t.pct*hourly();earn(r);s.claim=Date.now();S.tasksDone++;toast('Награда за задание: +'+fmt(r));hap('ok');render();save()}
+
+function render(){
+ const i=lvlIdx(),cur=LEVELS[i],nx=LEVELS[i+1],tp=tapPower(),ps=perSec();
+ $('bal').textContent=fmt(S.coins);
+ $('rate').textContent=num(ps)+' ₽/сек'+(bm()!==1?' ×'+bm().toString().replace('.',','):'');
+ $('lvTag').textContent='Уровень '+(i+1);$('lvName').textContent=cur.n;
+ if(nx){$('lvNext').textContent='до «'+nx.n+'»: '+fmt(nx.min-S.total);$('lvFill').style.width=Math.min(100,(S.total-cur.min)/(nx.min-cur.min)*100)+'%'}
+ else{$('lvNext').textContent='максимум';$('lvFill').style.width='100%'}
+ if($('t-up').classList.contains('on')){
+  $('sTap').textContent=fmt(tp);$('sSec').textContent=fmt(ps);$('sMul').textContent='+'+Math.round((mult()-1)*100)+'%';
+  UPS.forEach(u=>{const r=UR[u.id],c=cost(u);r.b.disabled=S.coins<c;r.pr.textContent=fmt(c);
+   r.sub.textContent=(u.type==='tap'?'+'+num(u.val)+' за тап':'+'+num(u.val)+' ₽/сек')+', куплено: '+(S.lv[u.id]||0)});
+  document.querySelectorAll('#lvls .lv').forEach((e,j)=>{e.className='lv'+(j===i?' cur':j<i?' done':'');
+   e.children[0].textContent=j<i?'✓':j===i?'●':'○';e.children[2].textContent=j?fmt(LEVELS[j].min)+', +'+j*5+'%':'старт'});
+ }
+ if($('t-tk').classList.contains('on'))renderTasks();
+}
+function renderTasks(){
+ const hr=hourly();$('tkNote').textContent='Награда не больше 15% дохода за час (сейчас час: '+fmt(hr)+'). После получения следующее выполнение откроется через 24 часа.';
+ document.querySelectorAll('#tks .row').forEach((e,i)=>{
+  const t=TASKS[i],s=S.tasks[t.id],b=e.querySelector('.tk'),left=s.claim?s.claim+DAY-Date.now():0;
+  e.querySelector('span').textContent=s.claim?'Выполнено':'Прогресс: '+num(s.p)+' из '+num(t.goal);
+  e.querySelector('.pb i').style.width=(s.claim?100:s.p/t.goal*100)+'%';
+  if(s.claim){const h=Math.floor(left/36e5),m=Math.floor(left%36e5/6e4),c=Math.floor(left%6e4/1e3);b.disabled=true;b.textContent=[h,m,c].map(v=>String(v).padStart(2,'0')).join(':')}
+  else if(s.p>=t.goal){b.disabled=false;b.textContent='Забрать +'+num(t.pct*hr)}
+  else{b.disabled=true;b.textContent='+'+num(t.pct*hr)+' ₽'}
+ });
+}
+function renderAch(){let n=0;document.querySelectorAll('#achs .ach').forEach((e,i)=>{const o=!!S.ach[i];e.classList.toggle('on',o);if(o)n++});$('acN').textContent=n+' из '+ACH.length}
+function checkAch(){ACH.forEach((a,i)=>{if(!S.ach[i]&&a[3]()){S.ach[i]=1;toast('Достижение: '+a[1]);hap('ok');renderAch()}})}
+
+// тап
+const tooth=$('tooth'),stage=$('stage');
+tooth.addEventListener('pointerdown',e=>{
+ e.preventDefault();const p=tapPower();earn(p);S.taps++;inc('taps',1);hap('light');tooth.classList.add('down');
+ const r=stage.getBoundingClientRect(),f=document.createElement('span');f.className='float';f.textContent='+'+num(p);
+ f.style.left=(e.clientX-r.left-12)+'px';f.style.top=(e.clientY-r.top-24)+'px';stage.appendChild(f);f.addEventListener('animationend',()=>f.remove());
+ $('hint').textContent='';render();
+});
+['pointerup','pointerleave','pointercancel'].forEach(v=>tooth.addEventListener(v,()=>tooth.classList.remove('down')));
+
+// вкладки
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{
+ document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
+ document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.id===b.dataset.t));
+ hap('sel');if(b.dataset.t==='t-up')inc('cab',1);if(b.dataset.t==='t-rk')loadTop();render();
+}));
+
+// ситуации
+function schedEv(){setTimeout(()=>{showEv();schedEv()},(70+Math.random()*80)*1e3)}
+function showEv(){
+ if($('ev').classList.contains('on'))return;const e=EV[Math.random()*EV.length|0];$('evT').textContent=e.t;
+ const box=$('evO');box.textContent='';e.o.forEach(o=>{const x=document.createElement('button');x.textContent=o.l;x.onclick=()=>pick(o);box.appendChild(x)});
+ $('ev').classList.add('on');hap('sel');
+}
+function pick(o){
+ $('ev').classList.remove('on');const base=Math.max(20,perSec()*180+tapPower()*30);let d=o.d*base;
+ if(d<0)d=-Math.min(-d,S.coins*.1);if(d>0)earn(d);else S.coins+=d;
+ if(o.b)S.buff={m:o.b[0],until:Date.now()+o.b[1]*1e3};
+ const g=d>0||(o.b&&o.b[0]>1),bd=d<0||(o.b&&o.b[0]<1);
+ if(g&&!bd)S.good++;else if(bd&&!g)S.bad++;S.events++;inc('ev',1);
+ toast(o.r+(d?' '+(d>0?'+':'−')+fmt(Math.abs(d)):''));hap(g&&!bd?'ok':bd&&!g?'bad':'sel');render();save();
+}
+
+// рейтинг (Supabase)
+const H=()=>({apikey:SB.key,Authorization:'Bearer '+SB.key,'Content-Type':'application/json'});
+async function sbSync(){if(!SB.url)return;try{await fetch(SB.url+'/rest/v1/players?on_conflict=id',{method:'POST',headers:Object.assign(H(),{Prefer:'resolution=merge-duplicates,return=minimal'}),
+ body:JSON.stringify({id:PID,name:NAME,total:Math.floor(S.total),level:lvlIdx()+1,updated_at:new Date().toISOString()})})}catch(e){}}
+async function loadTop(){
+ const box=$('top');if(!SB.url){$('rkN').textContent='Рейтинг заработает после подключения Supabase: впишите url и key в начале скрипта.';return}
+ $('rkN').textContent='Загрузка…';await sbSync();
+ try{const r=await fetch(SB.url+'/rest/v1/players?select=id,name,total,level&order=total.desc&limit=100',{headers:H()});const d=await r.json();
+  box.textContent='';$('rkN').textContent='Игроков в списке: '+d.length;
+  const mk=(c,t)=>{const s=document.createElement('span');s.className=c;s.textContent=t;return s};
+  d.forEach((p,i)=>{const row=document.createElement('div');row.className='rk'+(p.id===PID?' me':'');
+   row.append(mk('n',i+1),mk('nm',p.name||'Игрок'),mk('lv2','ур. '+p.level),mk('sc',fmt(p.total)));box.appendChild(row)});
+ }catch(e){$('rkN').textContent='Не удалось загрузить рейтинг. Проверьте подключение.'}
+}
+
+// цикл
+setInterval(()=>{
+ const ps=perSec();if(ps>0)earn(ps);
+ TASKS.forEach(t=>{const s=S.tasks[t.id];if(s.claim&&Date.now()>=s.claim+DAY){s.p=0;s.claim=0}});
+ inc('time',1);checkAch();render();
+},1000);
+setInterval(save,3000);setInterval(sbSync,20000);
+document.addEventListener('visibilitychange',save);
+
+(function init(){
+ if(tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user)$('holder').textContent=('Д-р '+NAME).toUpperCase();
+ buildUps();
+ const away=Math.min((Date.now()-(S.seen||Date.now()))/1e3,CAP),gain=away*sum('auto')*mult();
+ if(gain>=1){earn(gain);S.offline++;toast('Пока вас не было, клиника заработала '+fmt(gain))}
+ renderAch();checkAch();render();save();schedEv();
+})();
+</script>
+</body>
+</html>
