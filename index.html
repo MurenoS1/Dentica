@@ -161,7 +161,7 @@ const UPS=[];
 TN.forEach((n,i)=>UPS.push({id:'t'+i,ic:TI[i],name:n,type:'tap',val:Math.round(Math.pow(2.3,i)),base:Math.round(40*Math.pow(3.1,i)),k:1.35}));
 AN.forEach((n,i)=>UPS.push({id:'a'+i,ic:AI[i],name:n,type:'auto',val:Math.round(5*Math.pow(2.5,i))/10,base:Math.round(120*Math.pow(3.2,i)),k:1.35}));
 const LN=['Студент','Практикант','Интерн','Ординатор','Ассистент врача','Терапевт','Хирург','Ортодонт','Пародонтолог','Эндодонтист','Имплантолог','Челюстно-лицевой хирург','Заведующий отделением','Главврач','Владелец кабинета','Владелец клиники','Директор сети','Эксперт-лектор','Профессор','Академик','Легенда стоматологии','Зубная фея'];
-const LEVELS=LN.map((n,i)=>({n,min:i?Math.round(300*Math.pow(2.2,i-1)):0}));
+const LEVELS=LN.map((n,i)=>({n,min:i?Math.round(1500*Math.pow(2.2,i-1)):0}));
 const TASKS=[
  {id:'taps',t:'Сделать 300 тапов',goal:300,pct:.06},{id:'buy',t:'Купить 3 улучшения',goal:3,pct:.08},
  {id:'cab',t:'Заглянуть в кабинет',goal:1,pct:.03},{id:'ev',t:'Решить игровую ситуацию',goal:1,pct:.10},
