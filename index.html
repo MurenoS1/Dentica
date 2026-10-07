@@ -129,6 +129,11 @@ input{user-select:text;-webkit-user-select:text;width:100%;margin-top:6px;paddin
   <div class="row"><div class="tx"><b>Имя в рейтинге</b><input id="stN" maxlength="20" placeholder="Ваше имя"></div></div>
   <button class="row" id="stV"><div class="tx"><b>Вибрация</b></div><div class="pr" id="stVs"></div></button>
   <button class="row" id="stS"><div class="tx"><b>Звук</b></div><div class="pr" id="stSs"></div></button></section>
+<section class="tab" id="t-fr"><h2>Друзья</h2><p class="note" id="frN"></p>
+  <div class="stats" style="margin-top:10px"><div class="stat"><span>Друзей</span><b id="frA"></b></div><div class="stat"><span>Дошли до 2 уровня</span><b id="frB"></b></div><div class="stat"><span>К получению</span><b id="frC"></b></div></div>
+  <input id="frL" readonly style="margin-top:12px">
+  <div style="display:flex;gap:8px;margin-top:8px"><button class="tk" id="frS" style="flex:1;padding:12px">Пригласить</button><button class="tk" id="frCp" style="flex:1;padding:12px">Копировать</button></div>
+  <button class="tk" id="frCl" style="width:100%;padding:14px;margin-top:8px"></button></section>
 </main>
 <nav>
  <button class="on" data-t="t-main"><span>🦷</span>Приём</button>
@@ -137,6 +142,7 @@ input{user-select:text;-webkit-user-select:text;width:100%;margin-top:6px;paddin
  <button data-t="t-tk"><span>📋</span>Задания</button>
  <button data-t="t-ac"><span>🏆</span>Награды</button>
  <button data-t="t-rk"><span>📊</span>Рейтинг</button>
+ <button data-t="t-fr"><span>👥</span>Друзья</button>
  <button data-t="t-pr"><span>⭐</span>Стаж</button>
  <button data-t="t-st"><span>⚙️</span>Настройки</button>
 </nav>
@@ -161,7 +167,7 @@ const UPS=[];
 TN.forEach((n,i)=>UPS.push({id:'t'+i,ic:TI[i],name:n,type:'tap',val:Math.round(Math.pow(2.3,i)),base:Math.round(40*Math.pow(3.1,i)),k:1.35}));
 AN.forEach((n,i)=>UPS.push({id:'a'+i,ic:AI[i],name:n,type:'auto',val:Math.round(5*Math.pow(2.5,i))/10,base:Math.round(120*Math.pow(3.2,i)),k:1.35}));
 const LN=['Студент','Практикант','Интерн','Ординатор','Ассистент врача','Терапевт','Хирург','Ортодонт','Пародонтолог','Эндодонтист','Имплантолог','Челюстно-лицевой хирург','Заведующий отделением','Главврач','Владелец кабинета','Владелец клиники','Директор сети','Эксперт-лектор','Профессор','Академик','Легенда стоматологии','Зубная фея'];
-const LEVELS=LN.map((n,i)=>({n,min:i?Math.round(1500*Math.pow(2.2,i-1)):0}));
+const LEVELS=LN.map((n,i)=>({n,min:i?Math.round(7500*Math.pow(2.2,i-1)):0}));
 const TASKS=[
  {id:'taps',t:'Сделать 300 тапов',goal:300,pct:.06},{id:'buy',t:'Купить 3 улучшения',goal:3,pct:.08},
  {id:'cab',t:'Заглянуть в кабинет',goal:1,pct:.03},{id:'ev',t:'Решить игровую ситуацию',goal:1,pct:.10},
@@ -202,7 +208,7 @@ function num(n){if(n<1e4)return(n<100&&n%1?Math.round(n*10)/10:Math.floor(n)).to
 const fmt=n=>num(n)+' ₽';
 const lvlIdx=()=>{let i=0;LEVELS.forEach((l,j)=>{if(S.total>=l.min)i=j});return i};
 const bm=()=>Date.now()<S.buff.until?S.buff.m:1;
-const mult=()=>1+.05*lvlIdx();
+const mult=()=>1+.025*lvlIdx();
 const sum=t=>UPS.filter(u=>u.type===t).reduce((a,u)=>a+(S.lv[u.id]||0)*u.val,0);
 const pm=()=>Math.pow(1.5,S.resets||0);
 const tapPower=()=>(1+sum('tap'))*mult()*bm()*pm();
@@ -246,15 +252,16 @@ function render(){
  if(nx){$('lvNext').textContent='до «'+nx.n+'»: '+fmt(nx.min-S.total);$('lvFill').style.width=Math.min(100,(S.total-cur.min)/(nx.min-cur.min)*100)+'%'}
  else{$('lvNext').textContent='максимум';$('lvFill').style.width='100%'}
  if($('t-up').classList.contains('on')){
-  $('sTap').textContent=fmt(tp);$('sSec').textContent=fmt(ps);$('sMul').textContent='+'+Math.round((mult()-1)*100)+'%';
+  $('sTap').textContent=fmt(tp);$('sSec').textContent=fmt(ps);$('sMul').textContent='+'+(Math.round((mult()-1)*1000)/10).toLocaleString('ru-RU')+'%';
   UPS.forEach(u=>{const r=UR[u.id],c=cost(u);r.b.disabled=S.coins<c;r.pr.textContent=fmt(c);
    r.sub.textContent=(u.type==='tap'?'+'+num(u.val)+' за тап':'+'+num(u.val)+' ₽/сек')+', куплено: '+(S.lv[u.id]||0)});
   document.querySelectorAll('#lvls .lv').forEach((e,j)=>{e.className='lv'+(j===i?' cur':j<i?' done':'');
-   e.children[0].textContent=j<i?'✓':j===i?'●':'○';e.children[2].textContent=j?fmt(LEVELS[j].min)+', +'+j*5+'%':'старт'});
+   e.children[0].textContent=j<i?'✓':j===i?'●':'○';e.children[2].textContent=j?fmt(LEVELS[j].min)+', +'+(j*2.5).toLocaleString('ru-RU')+'%':'старт'});
  }
  if($('t-tk').classList.contains('on'))renderTasks();
  if($('t-gm').classList.contains('on'))renderGames();
  if($('t-pr').classList.contains('on'))renderPrestige();
+ if($('t-fr').classList.contains('on'))renderRef();
 }
 function renderTasks(){
  const hr=hourly();$('tkNote').textContent='Награда не больше 15% дохода за час (сейчас час: '+fmt(hr)+'). После получения следующее выполнение откроется через 24 часа.';
@@ -284,7 +291,7 @@ tooth.addEventListener('pointerdown',e=>{
 document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{
  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.id===b.dataset.t));
- hap('sel');try{b.scrollIntoView({inline:'center',block:'nearest'})}catch(e){}if(b.dataset.t==='t-up')inc('cab',1);if(b.dataset.t==='t-rk')loadTop();render();
+ hap('sel');try{b.scrollIntoView({inline:'center',block:'nearest'})}catch(e){}if(b.dataset.t==='t-up')inc('cab',1);if(b.dataset.t==='t-rk')loadTop();if(b.dataset.t==='t-fr')loadRefs();render();
 }));
 
 // ситуации
@@ -329,7 +336,9 @@ function gmStop(){GT.forEach(t=>{clearInterval(t);clearTimeout(t)});GT=[]}
 const GAMES=[
  {id:'g1',ic:'🎯',name:'Тир «Зубастик»',desc:'10 секунд: лови зуб. Каждое попадание даёт 10% часового дохода.',run:gShoot},
  {id:'g2',ic:'🧠',name:'Пары инструментов',desc:'Найди 6 пар. Чем меньше ходов, тем больше награда (до 250% часа).',run:gMemory},
- {id:'g3',ic:'🪥',name:'Порядок процедур',desc:'Повтори последовательность. Каждый раунд даёт 25% часа, максимум 10 раундов.',run:gSimon}];
+ {id:'g3',ic:'🪥',name:'Порядок процедур',desc:'Повтори последовательность. Каждый раунд даёт 25% часа, максимум 10 раундов.',run:gSimon},
+ {id:'g4',ic:'🦠',name:'Найди кариес',desc:'20 секунд: найди заражённый зуб среди здоровых. Находка даёт 15% часа, ошибка отнимает 2 секунды.',run:gFind},
+ {id:'g5',ic:'🧾',name:'Касса клиники',desc:'20 секунд: быстро посчитай стоимость приёма. Верный ответ даёт 15% часа, ошибка отнимает 2 секунды.',run:gCash}];
 function buildGames(){
  $('gms').innerHTML=GAMES.map(g=>'<div class="row"><div class="ic">'+g.ic+'</div><div class="tx"><b>'+g.name+'</b><span>'+g.desc+'</span></div><button class="tk">Играть</button></div>').join('');
  document.querySelectorAll('#gms .tk').forEach((b,i)=>b.onclick=()=>openGame(GAMES[i]));
@@ -380,7 +389,7 @@ function gSimon(b){const H=hourly(),I=['🪥','💧','🦷','💡'];let seq=[],p
 
 // стаж (престиж)
 function ask(m,cb){if(tg&&tg.showConfirm)tg.showConfirm(m,ok=>{if(ok)cb()});else if(confirm(m))cb()}
-const PMIN=5e5,gainSt=()=>Math.max(1,Math.floor(Math.sqrt(S.total/PMIN)));
+const PMIN=5e5,gainSt=()=>1;
 function renderPrestige(){const x=v=>(Math.round(v*100)/100).toLocaleString('ru-RU');
  $('prS').textContent=S.stazh;$('prR').textContent=S.resets;$('prM').textContent='×'+x(pm());
  $('prN').textContent='Обнуляет деньги, улучшения и уровень. Достижения, задания и настройки остаются. После обнуления скорость развития растёт ещё на 50%: с ×'+x(pm())+' до ×'+x(pm()*1.5)+'. Доступно, когда за забег заработано '+fmt(PMIN)+' (сейчас '+fmt(S.total)+'). За обнуление сейчас: +'+gainSt()+' стажа.';
@@ -391,11 +400,58 @@ function doPrestige(){if(S.total<PMIN)return;ask('Обнулить прогре�
 // настройки
 function renderSet(){$('stVs').textContent=S.set.vib?'Вкл':'Выкл';$('stSs').textContent=S.set.snd?'Вкл':'Выкл'}
 function buildExtra(){
- buildGames();renderSet();$('stN').value=nm();
+ buildGames();buildRef();renderSet();$('stN').value=nm();
  $('prB').onclick=doPrestige;
  $('stN').onchange=()=>{S.name=$('stN').value.trim().slice(0,20);if(!S.name)$('stN').value=TGN;$('holder').textContent=('Д-р '+nm()).toUpperCase();toast('Имя сохранено');save();sbSync()};
  $('stV').onclick=()=>{S.set.vib=!S.set.vib;renderSet();save();hap('sel')};
  $('stS').onclick=()=>{S.set.snd=!S.set.snd;renderSet();save();hap('sel')};
+}
+
+// друзья
+const BOT='Dental_med_bot',APP='',REFPCT=25,WELCOME=50000;
+const SP=(tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param)||'';
+const inTg=()=>!!(tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user);
+const refLink=()=>'https://t.me/'+BOT+(APP?'/'+APP:'')+'?startapp=ref_'+PID;
+let REF={friends:0,active:0,unclaimed:0};
+function renderRef(){const hr=hourly();
+ $('frA').textContent=REF.friends;$('frB').textContent=REF.active;$('frC').textContent=REF.unclaimed;
+ $('frN').textContent=inTg()?'Друг считается, когда дойдёт до 2 уровня: вы получите '+REFPCT+'% дохода за час за каждого (сейчас '+fmt(REFPCT/100*hr)+'). Друг получит приветственный бонус '+fmt(WELCOME)+'.':'Реферальная ссылка работает только в Telegram. Откройте игру через бота.';
+ $('frL').value=inTg()?refLink():'';
+ $('frCl').disabled=REF.unclaimed<1;$('frCl').textContent=REF.unclaimed>0?'Забрать +'+num(REF.unclaimed*REFPCT/100*hr)+' ₽':'Нет наград'}
+async function loadRefs(){if(SB.url){try{const r=await rpc('get_refs',{p_id:PID});const d=await r.json();
+ if(r.ok&&d[0])REF={friends:+d[0].friends,active:+d[0].active,unclaimed:+d[0].unclaimed}}catch(e){}}renderRef()}
+async function regRef(){const inv=SP.startsWith('ref_')?SP.slice(4):'';
+ if(!inv||inv===PID||S.refDone||!SB.url||!inTg()||S.life>0)return;
+ try{const r=await rpc('register_referral',{p_invited:PID,p_inviter:inv});const ok=await r.json();
+  if(r.ok){S.refDone=1;if(ok===true){S.coins+=WELCOME;toast('Приветственный бонус: +'+fmt(WELCOME));hap('ok')}save()}}catch(e){}}
+function buildRef(){
+ $('frS').onclick=()=>{const u='https://t.me/share/url?url='+encodeURIComponent(refLink())+'&text='+encodeURIComponent('Заходи в «Зубной капитал»: на старте получишь '+num(WELCOME)+' ₽!');
+  try{if(tg&&tg.openTelegramLink)tg.openTelegramLink(u);else window.open(u,'_blank')}catch(e){}};
+ $('frCp').onclick=async()=>{try{await navigator.clipboard.writeText(refLink());toast('Ссылка скопирована')}catch(e){$('frL').select();toast('Выделите ссылку и скопируйте')}};
+ $('frCl').onclick=async()=>{try{const r=await rpc('claim_refs',{p_id:PID});const n=+(await r.json());
+  if(r.ok&&n>0){const x=n*REFPCT/100*hourly();S.coins+=x;toast('Награда за друзей: +'+fmt(x));hap('ok');save()}}catch(e){toast('Не удалось забрать награду')}loadRefs()};
+}
+
+// ещё две мини-игры
+function gFind(b){const H=hourly();let n=0,left=20,size=3;
+ b.innerHTML='<div class="note" id="gi"></div><div class="mg" id="mg"></div>';
+ const g=$('mg'),info=()=>{$('gi').textContent='Осталось: '+left+' с, найдено: '+n};
+ function end(){gmStop();const r=n*.15*H;earn(r);b.innerHTML='<h3>Время вышло</h3><p>Найдено: '+n+'. Награда: +'+fmt(r)+'</p>';hap('ok');save()}
+ function mk(){g.textContent='';size=Math.min(6,3+Math.floor(n/3));g.style.gridTemplateColumns='repeat('+size+',1fr)';const t=Math.random()*size*size|0;
+  for(let i=0;i<size*size;i++){const x=document.createElement('button');x.textContent=i===t?'🦠':'🦷';x.style.fontSize=(size>4?20:26)+'px';
+   x.onpointerdown=e=>{e.preventDefault();if(i===t){n++;hap('light');mk();info()}else{left=Math.max(0,left-2);hap('bad');if(left<=0)return end();info()}};g.appendChild(x)}}
+ mk();info();GT.push(setInterval(()=>{left--;info();if(left<=0)end()},1000));
+}
+function gCash(b){const H=hourly();let ok=0,left=20,ans=0;
+ b.innerHTML='<div class="note" id="gi"></div><h3 id="gq" style="text-align:center;font-size:28px;margin:18px 0"></h3><div class="sm" id="sm" style="grid-template-columns:1fr 1fr 1fr"></div>';
+ const info=()=>{$('gi').textContent='Осталось: '+left+' с, верно: '+ok};
+ function end(){gmStop();const r=ok*.15*H;earn(r);b.innerHTML='<h3>Смена окончена</h3><p>Верных ответов: '+ok+'. Награда: +'+fmt(r)+'</p>';hap('ok');save()}
+ function q(){const k=Math.min(60,10+ok*3);let A=Math.ceil(Math.random()*k)+2,B=Math.ceil(Math.random()*k)+2;const plus=Math.random()<.6;
+  if(!plus&&B>A){const t=A;A=B;B=t}ans=plus?A+B:A-B;$('gq').textContent=A+(plus?' + ':' − ')+B+' = ?';
+  const o=new Set([ans]);while(o.size<3){const d=ans+(Math.random()*7|0)-3;if(d>=0)o.add(d)}
+  $('sm').textContent='';[...o].sort(()=>Math.random()-.5).forEach(v=>{const x=document.createElement('button');x.textContent=v;x.style.cssText='height:80px;font-size:26px';
+   x.onpointerdown=e=>{e.preventDefault();if(v===ans){ok++;hap('light')}else{left=Math.max(0,left-2);hap('bad');if(left<=0)return end()}info();q()};$('sm').appendChild(x)})}
+ q();info();GT.push(setInterval(()=>{left--;info();if(left<=0)end()},1000));
 }
 
 // цикл
@@ -407,7 +463,7 @@ setInterval(()=>{
 setInterval(save,3000);setInterval(sbSync,20000);
 document.addEventListener('visibilitychange',save);
 
-(function init(){if(S.life<S.total)S.life=S.total;
+(function init(){if(S.life<S.total)S.life=S.total;regRef();
  $('holder').textContent=('Д-р '+nm()).toUpperCase();
  buildUps();buildExtra();
  const away=Math.min((Date.now()-(S.seen||Date.now()))/1e3,CAP),gain=away*sum('auto')*mult()*pm();
