@@ -84,6 +84,10 @@ nav button span{font-size:18px}nav button.on{background:var(--ink);color:var(--b
 .sm{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
 .sm button{height:110px;font-size:44px;border-radius:18px;border:1px solid var(--line);background:var(--panel);transition:transform .1s,background .1s}.sm button.f{background:var(--ac);transform:scale(.94)}
 input{user-select:text;-webkit-user-select:text;width:100%;margin-top:6px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:16px var(--body)}
+.seg{display:flex;gap:6px;margin:12px 0 8px}
+.seg button{flex:1;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--muted);font:600 13px var(--body)}
+.seg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.pane{display:none}.pane.on{display:block}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 </head>
@@ -111,10 +115,10 @@ input{user-select:text;-webkit-user-select:text;width:100%;margin-top:6px;paddin
   <div><div class="lvline"><span id="lvName"></span><span id="lvNext"></span></div><div class="lvbar"><i id="lvFill"></i></div></div>
  </section>
  <section class="tab" id="t-up">
-  <div class="stats"><div class="stat"><span>За тап</span><b id="sTap"></b></div><div class="stat"><span>В секунду</span><b id="sSec"></b></div><div class="stat"><span>Бонус уровня</span><b id="sMul"></b></div></div>
-  <h2>Для тапа</h2><div id="upT"></div>
-  <h2>Для дохода</h2><div id="upA"></div>
-  <h2>Уровни</h2><div id="lvls"></div>
+  <div class="stats"><div class="stat"><span>За тап</span><b id="sTap"></b></div><div class="stat"><span>В секунду</span><b id="sSec"></b></div><div class="stat"><span>Уровень</span><b id="sMul"></b></div></div>
+  <div class="seg"><button class="on" data-p="upT">Тап</button><button data-p="upA">Доход</button><button data-p="lvls">Уровни</button></div>
+  <p class="note" style="margin:0 0 8px">Новые улучшения открываются по мере покупок.</p>
+  <div id="upT" class="pane on"></div><div id="upA" class="pane"></div><div id="lvls" class="pane"></div>
  </section>
  <section class="tab" id="t-tk">
   <h2>Задания дня</h2>
@@ -130,7 +134,7 @@ input{user-select:text;-webkit-user-select:text;width:100%;margin-top:6px;paddin
   <button class="row" id="stV"><div class="tx"><b>Вибрация</b></div><div class="pr" id="stVs"></div></button>
   <button class="row" id="stS"><div class="tx"><b>Звук</b></div><div class="pr" id="stSs"></div></button></section>
 <section class="tab" id="t-fr"><h2>Друзья</h2><p class="note" id="frN"></p>
-  <div class="stats" style="margin-top:10px"><div class="stat"><span>Друзей</span><b id="frA"></b></div><div class="stat"><span>Дошли до 2 уровня</span><b id="frB"></b></div><div class="stat"><span>К получению</span><b id="frC"></b></div></div>
+  <div class="stats" style="margin-top:10px"><div class="stat"><span>Друзей</span><b id="frA"></b></div><div class="stat"><span>Заработали 7 500 ₽</span><b id="frB"></b></div><div class="stat"><span>К получению</span><b id="frC"></b></div></div>
   <input id="frL" readonly style="margin-top:12px">
   <div style="display:flex;gap:8px;margin-top:8px"><button class="tk" id="frS" style="flex:1;padding:12px">Пригласить</button><button class="tk" id="frCp" style="flex:1;padding:12px">Копировать</button></div>
   <button class="tk" id="frCl" style="width:100%;padding:14px;margin-top:8px"></button></section>
@@ -163,11 +167,15 @@ const TN=['Электрощётка','Ирригатор','Бормашина','
 const TI=['🪥','💧','🦷','🔊','🔦','💡','⚙️','💨','🔬','📷','🖨️','🤖','🧠','✨','⚛️'];
 const AN=['Администратор','Ассистент','Новое кресло','Рентген','Стерилизатор','Рекламный баннер','Сайт с записью','Второй кабинет','Зубной техник','Своя лаборатория','Франшиза','Страховой договор','Сеть клиник','Научный центр','Дентал-холдинг'];
 const AI=['🧑‍💼','🧑‍⚕️','💺','☢️','♨️','📣','🌐','🚪','🧑‍🔧','🧪','🏷️','📄','🏥','🎓','🏛️'];
+TN.push('Алмазный бор','Турбинный наконечник','Лазерный скальпель','Апекслокатор','Интраоральная камера','Налобная лупа','Пьезохирургия','Хирургический микромотор','Томограф КЛКТ','Навигация для имплантов','CAD/CAM станок','Эргономичное кресло врача','Голографический экран','Нейроинтерфейс врача','Золотой наконечник');
+TI.push('💎','🌀','🔪','📡','🎥','🔎','〰️','🛠️','📸','🧭','🏭','🪑','🖥️','🧬','🏆');
+AN.push('Колл-центр','Мобильное приложение','Программа лояльности','Детский уголок','Кофейня в холле','Парковка для клиентов','Ночной приём','Выездная бригада','Зубной музей','Обучающий курс','Реклама на ТВ','Партнёрство с банком','Международная клиника','Свой бренд паст','Дентал-университет');
+AI.push('☎️','📱','🎁','🧸','☕','🅿️','🌙','🚑','🏺','📚','📺','🤝','🌍','🧴','🏫');
 const UPS=[];
-TN.forEach((n,i)=>UPS.push({id:'t'+i,ic:TI[i],name:n,type:'tap',val:Math.round(Math.pow(2.3,i)),base:Math.round(40*Math.pow(3.1,i)),k:1.35}));
-AN.forEach((n,i)=>UPS.push({id:'a'+i,ic:AI[i],name:n,type:'auto',val:Math.round(5*Math.pow(2.5,i))/10,base:Math.round(120*Math.pow(3.2,i)),k:1.35}));
+TN.forEach((n,i)=>UPS.push({id:'t'+i,i,ic:TI[i],name:n,type:'tap',val:Math.max(1,Math.round(Math.pow(1.75,i))),base:Math.round(60*Math.pow(2,i)),k:1.45}));
+AN.forEach((n,i)=>UPS.push({id:'a'+i,i,ic:AI[i],name:n,type:'auto',val:Math.round(5*Math.pow(1.8,i))/10,base:Math.round(200*Math.pow(2,i)),k:1.45}));
 const LN=['Студент','Практикант','Интерн','Ординатор','Ассистент врача','Терапевт','Хирург','Ортодонт','Пародонтолог','Эндодонтист','Имплантолог','Челюстно-лицевой хирург','Заведующий отделением','Главврач','Владелец кабинета','Владелец клиники','Директор сети','Эксперт-лектор','Профессор','Академик','Легенда стоматологии','Зубная фея'];
-const LEVELS=LN.map((n,i)=>({n,min:i?Math.round(7500*Math.pow(2.2,i-1)):0}));
+const LEVELS=LN.map((n,i)=>({n,min:i?Math.round(37500*Math.pow(2.2,i-1)):0}));
 const TASKS=[
  {id:'taps',t:'Сделать 300 тапов',goal:300,pct:.06},{id:'buy',t:'Купить 3 улучшения',goal:3,pct:.08},
  {id:'cab',t:'Заглянуть в кабинет',goal:1,pct:.03},{id:'ev',t:'Решить игровую ситуацию',goal:1,pct:.10},
@@ -196,9 +204,13 @@ const ACH=[
  ['🍀','Везунчик','5 удачных исходов',()=>S.good>=5],['🛡️','Стойкий','5 неудачных исходов',()=>S.bad>=5],
  ['✅','Дисциплина','Забери первую награду за задание',()=>S.tasksDone>=1],['📅','Режим врача','Забери 20 наград',()=>S.tasksDone>=20],
  ['🌙','Ночная смена','Получи доход, пока тебя не было',()=>S.offline>=1],['🐷','Копилка','Накопи 100 тыс ₽ на балансе',()=>S.coins>=1e5],
- ['🧬','Полный комплект','Купи каждое из 30 улучшений',()=>UPS.every(u=>S.lv[u.id])]];
+ ['🧬','Полный комплект','Купи каждое улучшение',()=>UPS.every(u=>S.lv[u.id])],
+ ['🛍️','Мастер закупок','Купи 300 улучшений',()=>S.bought>=300],['🖐️','Король тапа','50 000 тапов',()=>S.taps>=5e4],
+ ['🎮','Игровой зал','Сыграй во все 5 мини-игр',()=>Object.keys(S.games).length>=5],['♻️','Новый забег','Сделай первое обнуление',()=>S.resets>=1],
+ ['🎖️','Ветеран стажа','Сделай 5 обнулений',()=>S.resets>=5],['🤝','Друг клиники','Пригласи друга, заработавшего 7 500 ₽',()=>typeof REF!=='undefined'&&REF.active>=1],
+ ['🏛️','Зубной олигарх','Заработай за всё время 10 млрд ₽',()=>S.life>=1e10]];
 
-const RW=[5,5,8,12,5,6,10,15,5,12,20,8,12,20,6,15,5,10,8,8,5,12,6,10,20];
+const RW=[5,5,8,12,5,6,10,15,5,12,20,8,12,20,6,15,5,10,8,8,5,12,6,10,20,18,16,10,12,20,8,20];
 let S={resets:0,stazh:0,life:0,name:'',set:{vib:true,snd:true},games:{},coins:0,total:0,lv:{},seen:Date.now(),taps:0,bought:0,events:0,good:0,bad:0,tasksDone:0,offline:0,ach:{},tasks:{},buff:{m:1,until:0}};
 try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
 TASKS.forEach(t=>{if(!S.tasks[t.id])S.tasks[t.id]={p:0,claim:0}});
@@ -208,7 +220,7 @@ function num(n){if(n<1e4)return(n<100&&n%1?Math.round(n*10)/10:Math.floor(n)).to
 const fmt=n=>num(n)+' ₽';
 const lvlIdx=()=>{let i=0;LEVELS.forEach((l,j)=>{if(S.total>=l.min)i=j});return i};
 const bm=()=>Date.now()<S.buff.until?S.buff.m:1;
-const mult=()=>1+.025*lvlIdx();
+const mult=()=>1;
 const sum=t=>UPS.filter(u=>u.type===t).reduce((a,u)=>a+(S.lv[u.id]||0)*u.val,0);
 const pm=()=>Math.pow(1.5,S.resets||0);
 const tapPower=()=>(1+sum('tap'))*mult()*bm()*pm();
@@ -252,11 +264,12 @@ function render(){
  if(nx){$('lvNext').textContent='до «'+nx.n+'»: '+fmt(nx.min-S.total);$('lvFill').style.width=Math.min(100,(S.total-cur.min)/(nx.min-cur.min)*100)+'%'}
  else{$('lvNext').textContent='максимум';$('lvFill').style.width='100%'}
  if($('t-up').classList.contains('on')){
-  $('sTap').textContent=fmt(tp);$('sSec').textContent=fmt(ps);$('sMul').textContent='+'+(Math.round((mult()-1)*1000)/10).toLocaleString('ru-RU')+'%';
-  UPS.forEach(u=>{const r=UR[u.id],c=cost(u);r.b.disabled=S.coins<c;r.pr.textContent=fmt(c);
+  $('sTap').textContent=fmt(tp);$('sSec').textContent=fmt(ps);$('sMul').textContent=String(i+1);
+  const hi={tap:-1,auto:-1};UPS.forEach(u=>{if(S.lv[u.id]&&u.i>hi[u.type])hi[u.type]=u.i});
+  UPS.forEach(u=>{const r=UR[u.id],c=cost(u);r.b.style.display=u.i<=hi[u.type]+3?'':'none';r.b.disabled=S.coins<c;r.pr.textContent=fmt(c);
    r.sub.textContent=(u.type==='tap'?'+'+num(u.val)+' за тап':'+'+num(u.val)+' ₽/сек')+', куплено: '+(S.lv[u.id]||0)});
   document.querySelectorAll('#lvls .lv').forEach((e,j)=>{e.className='lv'+(j===i?' cur':j<i?' done':'');
-   e.children[0].textContent=j<i?'✓':j===i?'●':'○';e.children[2].textContent=j?fmt(LEVELS[j].min)+', +'+(j*2.5).toLocaleString('ru-RU')+'%':'старт'});
+   e.children[0].textContent=j<i?'✓':j===i?'●':'○';e.children[2].textContent=j?fmt(LEVELS[j].min):'старт'});
  }
  if($('t-tk').classList.contains('on'))renderTasks();
  if($('t-gm').classList.contains('on'))renderGames();
@@ -400,6 +413,7 @@ function doPrestige(){if(S.total<PMIN)return;ask('Обнулить прогре�
 // настройки
 function renderSet(){$('stVs').textContent=S.set.vib?'Вкл':'Выкл';$('stSs').textContent=S.set.snd?'Вкл':'Выкл'}
 function buildExtra(){
+ document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x===b));['upT','upA','lvls'].forEach(id=>$(id).classList.toggle('on',id===b.dataset.p));hap('sel');render()});
  buildGames();buildRef();renderSet();$('stN').value=nm();
  $('prB').onclick=doPrestige;
  $('stN').onchange=()=>{S.name=$('stN').value.trim().slice(0,20);if(!S.name)$('stN').value=TGN;$('holder').textContent=('Д-р '+nm()).toUpperCase();toast('Имя сохранено');save();sbSync()};
@@ -415,7 +429,7 @@ const refLink=()=>'https://t.me/'+BOT+(APP?'/'+APP:'')+'?startapp=ref_'+PID;
 let REF={friends:0,active:0,unclaimed:0};
 function renderRef(){const hr=hourly();
  $('frA').textContent=REF.friends;$('frB').textContent=REF.active;$('frC').textContent=REF.unclaimed;
- $('frN').textContent=inTg()?'Друг считается, когда дойдёт до 2 уровня: вы получите '+REFPCT+'% дохода за час за каждого (сейчас '+fmt(REFPCT/100*hr)+'). Друг получит приветственный бонус '+fmt(WELCOME)+'.':'Реферальная ссылка работает только в Telegram. Откройте игру через бота.';
+ $('frN').textContent=inTg()?'Друг считается, когда заработает 7 500 ₽: вы получите '+REFPCT+'% дохода за час за каждого (сейчас '+fmt(REFPCT/100*hr)+'). Друг получит приветственный бонус '+fmt(WELCOME)+'.':'Реферальная ссылка работает только в Telegram. Откройте игру через бота.';
  $('frL').value=inTg()?refLink():'';
  $('frCl').disabled=REF.unclaimed<1;$('frCl').textContent=REF.unclaimed>0?'Забрать +'+num(REF.unclaimed*REFPCT/100*hr)+' ₽':'Нет наград'}
 async function loadRefs(){if(SB.url){try{const r=await rpc('get_refs',{p_id:PID});const d=await r.json();
